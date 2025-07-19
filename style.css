@@ -1,0 +1,64 @@
+ /* Reset and base styles */
+ 
+ body {
+     margin: 0;
+     padding: 0;
+     font-family: Arial, sans-serif;
+     background: linear-gradient(to right, #667eea, #764ba2);
+     color: #fff;
+     min-height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+ /* Shared container style for login and app */
+ 
+ .login-container,
+ .app {
+     background: rgba(0, 0, 0, 0.4);
+     padding: 30px;
+     border-radius: 12px;
+     width: 90%;
+     max-width: 500px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+     text-align: center;
+ }
+ /* Input fields and buttons */
+ 
+ input,
+ textarea,
+ select,
+ button {
+     width: 100%;
+     margin-top: 10px;
+     padding: 10px;
+     border-radius: 8px;
+     border: none;
+     font-size: 1em;
+     box-sizing: border-box;
+ }
+ 
+ textarea {
+     resize: vertical;
+     min-height: 80px;
+ }
+ 
+ button {
+     background-color: #00c6ff;
+     color: white;
+     cursor: pointer;
+     font-weight: bold;
+     transition: background-color 0.3s ease;
+ }
+ 
+ button:hover {
+     background-color: #0086cc;
+ }
+ /* Optional: Make page responsive for small screens */
+ 
+ @media (max-width: 600px) {
+     .login-container,
+     .app {
+         padding: 20px;
+     }
+ }

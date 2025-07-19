@@ -1,0 +1,208 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | AI Review Generator</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background-color: #000;
+    }
+
+    .slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 1600%;
+      display: flex;
+      animation: slideRight 120s linear infinite;
+      z-index: -1;
+    }
+
+    .slideshow img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      opacity: 0.8;
+    }
+
+    @keyframes slideRight {
+      0% {
+        transform: translateX(-800vw);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .login-container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+      animation: fadeIn 1.5s ease forwards;
+    }
+
+    .login-container h2 {
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    form input {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    form button {
+      background-color: #ff6ec4;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.3s ease, background-color 0.4s ease;
+    }
+
+    form button:hover {
+      transform: scale(1.05);
+      background-color: #ff85d8;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Slideshow -->
+  <div class="slideshow">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+    <img src="https://1000logos.net/wp-content/uploads/2021/02/Flipkart-logo.png" alt="Flipkart">
+    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
+    <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Payment">
+    <img src="https://cdn-icons-png.flaticon.com/512/1049/1049856.png" alt="Bag">
+    <img src="https://cdn-icons-png.flaticon.com/512/891/891419.png" alt="Shop">
+    <img src="https://cdn-icons-png.flaticon.com/512/2784/2784445.png" alt="Mobile">
+    <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Store">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+    <img src="https://1000logos.net/wp-content/uploads/2021/02/Flipkart-logo.png" alt="Flipkart">
+    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
+    <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Payment">
+    <img src="https://cdn-icons-png.flaticon.com/512/1049/1049856.png" alt="Bag">
+    <img src="https://cdn-icons-png.flaticon.com/512/891/891419.png" alt="Shop">
+    <img src="https://cdn-icons-png.flaticon.com/512/2784/2784445.png" alt="Mobile">
+    <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Store">
+  </div>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <h2>Welcome to AI Review Generator</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Enter your Google Email" required />
+      <input type="password" id="password" placeholder="Enter your Password" required />
+      <button type="submit" id="loginBtn">Login</button>
+    </form>
+
+    <p style="margin-top: 20px;">Or</p>
+    <div class="g_id_signin" style="margin-top: 10px;"></div>
+  </div>
+
+  <script>
+    // ✅ Email/Password Login Handler
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const button = document.getElementById('loginBtn');
+      button.disabled = true;
+      button.innerText = "Logging in...";
+
+      try {
+        const response = await fetch('http://localhost:3000/api/sign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, method: 'Email/Password' })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('userEmail', email);
+          alert("✅ Login successful!");
+          window.location.href = 'review.html';
+        } else {
+          alert(result.message || "Login failed.");
+        }
+      } catch (error) {
+        alert("⚠️ Failed to connect to server.");
+      } finally {
+        button.disabled = false;
+        button.innerText = "Login";
+      }
+    });
+
+    // ✅ Google Sign-In
+    window.onload = () => {
+      google.accounts.id.initialize({
+        client_id: "550072686500-16q88ghgv0up60k7g6dok1d226lrush2.apps.googleusercontent.com",
+        callback: async (response) => {
+          try {
+            const token = response.credential;
+            const decoded = JSON.parse(atob(token.split('.')[1]));
+            const googleEmail = decoded.email;
+
+            await fetch('http://localhost:3000/api/sign', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: googleEmail, method: 'Google' })
+            });
+
+            localStorage.setItem('userEmail', googleEmail);
+            window.location.href = 'review.html';
+          } catch (err) {
+            alert("⚠️ Google login failed.");
+          }
+        }
+      });
+
+      google.accounts.id.renderButton(
+        document.querySelector(".g_id_signin"),
+        { theme: "outline", size: "large" }
+      );
+    };
+  </script>
+</body>
+</html>

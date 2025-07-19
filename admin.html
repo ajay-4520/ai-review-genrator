@@ -1,0 +1,22 @@
+ async function fetchUserLogins() {
+  try {
+    const response = await fetch("http://localhost:3000/api/admin/signed-users");
+    const users = await response.json();
+
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = "";
+
+    users.forEach(user => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${user.email}</td>
+        <td>${user.method}</td>
+        <td>${new Date(user.time).toLocaleString()}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    alert("⚠️ Failed to fetch login data.");
+    console.error(err);
+  }
+}

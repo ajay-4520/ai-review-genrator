@@ -1,0 +1,12 @@
+[
+  {
+    "email": "ajay@gmail.com",
+    "method": "manual",
+    "time": "2025-07-18T13:45:00.123Z"
+  },
+  {
+    "email": "ajaymekalathuri@gmail.com",
+    "method": "google",
+    "time": "2025-07-18T13:47:10.456Z"
+  }
+]
