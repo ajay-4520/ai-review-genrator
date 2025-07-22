@@ -1,22 +1,72 @@
- async function fetchUserLogins() {
-  try {
-    const response = await fetch("http://localhost:3000/api/admin/signed-users");
-    const users = await response.json();
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin | Signed Users</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
 
-    const tbody = document.getElementById("userTableBody");
-    tbody.innerHTML = "";
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
 
-    users.forEach(user => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${user.email}</td>
-        <td>${user.method}</td>
-        <td>${new Date(user.time).toLocaleString()}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    alert("⚠️ Failed to fetch login data.");
-    console.error(err);
-  }
-}
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #444;
+    }
+
+    th {
+      background-color: #222;
+      color: cyan;
+    }
+  </style>
+</head>
+<body>
+  <h2>👨‍💼 Signed Users</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Method</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchUsers() {
+      try {
+        const res = await fetch('http://localhost:3000/api/logins');
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message);
+
+        const tbody = document.querySelector("tbody");
+        data.forEach(user => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${user.email}</td>
+            <td>${user.loginType}</td>
+            <td>${new Date(user.createdAt).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert("⚠️ Failed to fetch login data.");
+      }
+    }
+
+    window.onload = fetchUsers;
+  </script>
+</body>
+</html>
+
