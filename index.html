@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,11 +6,7 @@
   <title>Login | AI Review Generator</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -20,7 +16,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
       background-color: #000;
     }
 
@@ -43,12 +38,8 @@
     }
 
     @keyframes slideRight {
-      0% {
-        transform: translateX(-800vw);
-      }
-      100% {
-        transform: translateX(0);
-      }
+      0% { transform: translateX(-800vw); }
+      100% { transform: translateX(0); }
     }
 
     .login-container {
@@ -93,20 +84,14 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Slideshow -->
+  <!-- 🔁 Background Slideshow -->
   <div class="slideshow">
     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
     <img src="https://1000logos.net/wp-content/uploads/2021/02/Flipkart-logo.png" alt="Flipkart">
@@ -116,6 +101,7 @@
     <img src="https://cdn-icons-png.flaticon.com/512/891/891419.png" alt="Shop">
     <img src="https://cdn-icons-png.flaticon.com/512/2784/2784445.png" alt="Mobile">
     <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Store">
+    <!-- Repeat for smooth looping -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
     <img src="https://1000logos.net/wp-content/uploads/2021/02/Flipkart-logo.png" alt="Flipkart">
     <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
@@ -126,13 +112,13 @@
     <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Store">
   </div>
 
-  <!-- Login Container -->
+  <!-- 🔐 Login Container -->
   <div class="login-container">
     <h2>Welcome to AI Review Generator</h2>
 
     <form id="loginForm">
       <input type="email" id="email" placeholder="Enter your Google Email" required />
-      <input type="password" id="password" placeholder="Enter your Password" required />
+      <input type="password" id="password" placeholder="Enter your Password" />
       <button type="submit" id="loginBtn">Login</button>
     </form>
 
@@ -154,7 +140,11 @@
         const response = await fetch('http://localhost:3000/api/sign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, method: 'Email/Password' })
+          body: JSON.stringify({
+            name: email.split('@')[0],
+            email: email,
+            method: 'Email/Password'
+          })
         });
 
         const result = await response.json();
@@ -174,7 +164,7 @@
       }
     });
 
-    // ✅ Google Sign-In
+    // ✅ Google Sign-In Handler
     window.onload = () => {
       google.accounts.id.initialize({
         client_id: "550072686500-16q88ghgv0up60k7g6dok1d226lrush2.apps.googleusercontent.com",
@@ -187,7 +177,11 @@
             await fetch('http://localhost:3000/api/sign', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: googleEmail, method: 'Google' })
+              body: JSON.stringify({
+                name: googleEmail.split('@')[0],
+                email: googleEmail,
+                method: 'Google'
+              })
             });
 
             localStorage.setItem('userEmail', googleEmail);
