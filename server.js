@@ -1,95 +1,92 @@
- // server.js
+   // server.js
+
 const express = require('express');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Initialize app
 const app = express();
+
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse incoming JSON
+
+// Configuration
 const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// ✅ Middleware
-app.use(cors());
-app.use(bodyParser.json());
+// MongoDB Connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB Atlas connected');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    // Retry after 5 seconds if it fails
+    setTimeout(connectDB, 5000);
+  }
+};
 
-// ✅ Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/AI-review', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB Connected Successfully to AI-review'))
-.catch(err => console.error('❌ MongoDB Connection Error:', err));
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️ MongoDB disconnected! Reconnecting...');
+  connectDB();
+});
 
-// ✅ Import model
-const User = require('./models/User'); // ✅ Correct path
+connectDB(); // Initial connect
 
-// ✅ Route: Sign-in / Sign-up
+// Schema & Model
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    loginType: String,
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model('User', userSchema);
+
+// ---------------- API ROUTES ----------------
+
+// Save user login (Google or email/password)
 app.post('/api/sign', async (req, res) => {
   try {
-    const { email, password, method } = req.body;
+    const { name, email, method } = req.body;
 
     if (!email || !method) {
-      return res.status(400).json({ message: 'Email and method are required' });
+      return res.status(400).json({ message: 'Missing required fields: email or method' });
     }
 
-    // 🔐 Email/Password method
-    if (method === 'Email/Password') {
-      if (!password) {
-        return res.status(400).json({ message: 'Password is required' });
-      }
+    const user = new User({ name, email, loginType: method });
+    await user.save();
 
-      const existingUser = await User.findOne({ email });
-
-      if (existingUser) {
-        const isMatch = await bcrypt.compare(password, existingUser.password);
-        if (!isMatch) {
-          return res.status(401).json({ message: 'Incorrect password' });
-        }
-        return res.status(200).json({ message: '✅ Login successful' });
-      } else {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword, method });
-        await newUser.save();
-        return res.status(201).json({ message: '✅ User registered and logged in' });
-      }
-    }
-
-    // 🔐 Google Sign-in method
-    else if (method === 'Google') {
-      const existingUser = await User.findOne({ email });
-
-      if (!existingUser) {
-        const newUser = new User({ email, method: 'Google' });
-        await newUser.save();
-        return res.status(201).json({ message: '✅ Google user registered' });
-      } else {
-        return res.status(200).json({ message: '✅ Google user logged in' });
-      }
-    }
-
-    // ❌ Invalid method
-    else {
-      return res.status(400).json({ message: 'Invalid method provided' });
-    }
-
+    res.status(201).json({ message: '✅ User saved successfully' });
   } catch (err) {
-    console.error('❌ Error in /api/sign:', err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    console.error('❌ Error saving user:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// ✅ Admin route: get all signed users
-app.get('/api/admin/signed-users', async (req, res) => {
+// Get all users (for admin or dashboard)
+app.get('/api/logins', async (req, res) => {
   try {
-    const users = await User.find().sort({ time: -1 });
-    res.status(200).json(users);
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json(users);
   } catch (err) {
-    console.error('❌ Error fetching users:', err);
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error('❌ Error fetching users:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// ✅ Start the server
+// ---------------- START SERVER ----------------
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
